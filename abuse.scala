@@ -12,10 +12,10 @@ object Abuse
 {
   def toFloat(a:Int, b:Int, c:Int):Float = s"$a.$b$c".toFloat
   
-  def test(a:List[Int], n:Float):Boolean=
+  def test(a:List[Int], ns:Float):Boolean=
   {
     val s = for(n <- a.sliding(3, 3)) yield toFloat(n(0), n(1), n(2))
-    s.reduce(_ + _) == n
+    s.reduce(_ + _) == ns
   }
   
   def main(args:Array[String]):Unit=

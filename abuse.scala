@@ -1,4 +1,9 @@
 /////////////////////////////////////////////////////////////////////////////
+// (a) Write down 3 numbers between 1 and 10, each with 2 decimal places, that 
+//     would add to 11.16. 
+// (b) Can you find a solution to part (a) that uses each digit from 1 to 9 
+//     exactly once each?
+//
 // I am so lazy and stupid, let's the computer do the work
 // psksvp@gmail.com
 ////////////////////////////////////////////////////////////////////////////

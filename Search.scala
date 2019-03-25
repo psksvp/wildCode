@@ -75,6 +75,12 @@ object Search
     }
   }
   
+  def allPaths(start:T)
+              (childrenF:(T) => Seq[T]):Seq[T] =
+  {
+    
+  }            
+  
   def main(args:Array[String]):Unit = 
   {
     val adj = Map('s' -> Seq('a', 'd'),

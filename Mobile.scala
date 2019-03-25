@@ -8,7 +8,7 @@ object Mobile
   
       Solve for (Lleft, Lright)
   
-      {{l1 -> (120 w2)/(w1 + w2), l2 -> (120 w1)/(w1 + w2)}}
+      {{l1 -> (120 * w2)/(w1 + w2), l2 -> (120 * w1)/(w1 + w2)}}
   */
   def solve(w1:Int, w2:Int, rodLength:Double = 120):(Double, Double) =
   {
@@ -18,22 +18,17 @@ object Mobile
   }
   
   def solve3Levels(w:Seq[Int]):Seq[(Double, Double)] =
-  {
-    val r = Array.ofDim[(Double, Double)](3)
-    r(2) = solve(w(2), w(3))
-    r(1) = solve(w(1), w(2) + w(3))
-    r(0) = solve(w(0), w(1) + w(2) + w(3))
-    r
+  {    
+    Seq(solve(w(0), w(1) + w(2) + w(3)), 
+        solve(w(1), w(2) + w(3)), 
+        solve(w(2), w(3)))
   }
   
   def solve2Levels(w:Seq[Int]):Seq[(Double, Double)] =
-  {
-    val r = Array.ofDim[(Double, Double)](3)
-    r(0) = solve(w(0), w(1))
-    r(2) = solve(w(2), w(3))
-    r(1) = solve(w(0) + w(1), w(2) + w(3))
-    
-    r
+  {    
+    Seq(solve(w(0), w(1)), 
+        solve(w(0) + w(1), w(2) + w(3)), 
+        solve(w(2), w(3)))
   }
   
   def pleasing(m:Seq[(Double, Double)]):Boolean = 

@@ -14,14 +14,19 @@ object Stone
       {
         if(grid.stones.contains(Loc(r, c)))
         {
-          print("-O-")
+          print(" O ")
         }
         else
         {
           if(0 == c || c == grid.size)
             print("|")
           else
-            print("-+-")
+          {
+            if(0 == r || r == grid.size)
+              print(" - ")
+            else
+              print(" + ")
+          }
         }
       }
       println()

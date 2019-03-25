@@ -85,6 +85,14 @@ object Search
                   'e' -> Seq('b', 'd', 'f'),
                   'f' -> Seq('e'))
                   
+    val dagadj = Map('s' -> Seq('a', 'd'),
+                     'a' -> Seq('b', 'd'),
+                     'b' -> Seq('c', 'e'),
+                     'c' -> Seq(),
+                     'd' -> Seq('e'),
+                     'e' -> Seq('f'),
+                     'f' -> Seq())              
+                  
     val coord = Map('s' -> (0, 3), 
                     'a' -> (4, 6),
                     'b' -> (7, 6),
@@ -105,10 +113,9 @@ object Search
       case Nil            => 0.0
       case a :: b :: Nil  => distance(a, b)
       case a :: b :: rest => distance(a, b) + cost(b +: rest)
-    }                    
-                       
-                  
-    val a = dfs('s', 'f'){n => adj.getOrElse(n, Nil)}
+    }  
+                                   
+    val a = dfs('s', 'f'){n => dagadj.getOrElse(n, Nil)}
     println(a)
     println()
     val b = bfs('s', 'f'){n => adj.getOrElse(n, Nil)}

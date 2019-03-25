@@ -1,5 +1,5 @@
 
-/// AMC math junk, question J3
+/// AMC math junk, question J3 stone map
 /// by Pongsak Suvanpong psksvp@gmail.com
 object Stone
 {
@@ -54,9 +54,8 @@ object Stone
   def walkable(a:Loc, b:Loc, grid:Grid):Boolean =
   {
     import scala.collection.mutable.Map
-    val m = for(s <- grid.stones) yield (s, false)
     val visited = Map[Loc, Boolean]()
-    visited ++= m
+    visited ++= (for(s <- grid.stones) yield (s, false))
 
 
     def dfs(start:Loc, end:Loc):Unit=
@@ -142,6 +141,9 @@ object Stone
                  Loc(3, 1), Loc(3, 2), Loc(3, 3)).xcombinations(7)
 
     for(e <- c if traceable(Grid(4, e))) display(Grid(4, e))
+    
+    println("--------------------")
+    List(1, 2, 3, 4).xcombinations(3).foreach(println(_))
   }
   
 }

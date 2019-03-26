@@ -23,11 +23,12 @@ object Search
     //println(s"$p ----->  $l")
     l
   }
-  
+
   /////////////////////////////////////////////////////
   /// all paths to goal:T from start:T
-  /////////////////////////////////////////////////////
-  def findAllPaths[T](start:T, goal:T)
+  /// all paths to leaves from start:T if goal is None
+  /////////////////////////////////////////////////////  
+  def allPaths[T](start:T, goal:Option[T] = None)
                      (childrenF:(T) => Seq[T]):Seq[Seq[T]]=
   { 
     def traverser(q:Seq[Seq[T]]):Seq[Seq[T]]=
@@ -36,33 +37,13 @@ object Search
         Nil
       else
       {
-        if(goal == q.head.head)   
-          q.head.reverse +: traverser(q.tail ++: extendPath(q.head)(childrenF))
-        else
-          traverser(q.tail ++: extendPath(q.head)(childrenF))  
+        goal match
+        {
+          case Some(g) if g == q.head.head            => q.head.reverse +: traverser(q.tail ++: extendPath(q.head)(childrenF))
+          case None if childrenF(q.head.head).isEmpty => q.head.reverse +: traverser(q.tail ++: extendPath(q.head)(childrenF))               
+          case _                                      => traverser(q.tail ++: extendPath(q.head)(childrenF))       
+        }
       }     
-    }
-    
-    traverser(Seq(Seq(start)))
-  }
-  
-  /////////////////////////////////////////////////////
-  /// all paths to leaves from start:T
-  /////////////////////////////////////////////////////
-  def allPaths[T](start:T)
-                 (childrenF:(T) => Seq[T]):Seq[Seq[T]]=
-  { 
-    def traverser(q:Seq[Seq[T]]):Seq[Seq[T]]=
-    {
-      if(q.isEmpty)
-        Nil
-      else
-      {
-        if(childrenF(q.head.head).nonEmpty)
-          traverser(q.tail ++: extendPath(q.head)(childrenF))
-        else  
-          q.head.reverse +: traverser(q.tail ++: extendPath(q.head)(childrenF)) 
-      }    
     }
     
     traverser(Seq(Seq(start)))
@@ -163,7 +144,7 @@ object Search
     
     allPaths('s'){n => dagadj.getOrElse(n, Nil)}.foreach(println(_))
     println()
-    println(findAllPaths('s', 'f'){n => dagadj.getOrElse(n, Nil)})
+    println(allPaths('s', Some('f')){n => dagadj.getOrElse(n, Nil)})
     println()
                                    
     val a = dfs('s', 'f'){n => dagadj.getOrElse(n, Nil)}

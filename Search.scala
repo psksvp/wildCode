@@ -19,11 +19,55 @@ object Search
   
   private def extendPath[T](p:Seq[T])(childrenF:(T) => Seq[T]):Seq[Seq[T]]=
   {
-    println(p.reverse)
-    for(e <- childrenF(p.head) if !p.contains(e)) yield e +: p
+    val l = for(e <- childrenF(p.head) if !p.contains(e)) yield e +: p
+    //println(s"$p ----->  $l")
+    l
   }
   
-  ////////
+  /////////////////////////////////////////////////////
+  /// all paths to goal:T from start:T
+  /////////////////////////////////////////////////////
+  def findAllPaths[T](start:T, goal:T)
+                     (childrenF:(T) => Seq[T]):Seq[Seq[T]]=
+  { 
+    def traverser(q:Seq[Seq[T]]):Seq[Seq[T]]=
+    {
+      if(q.isEmpty)
+        Nil
+      else
+      {
+        if(goal == q.head.head)   
+          q.head.reverse +: traverser(q.tail ++: extendPath(q.head)(childrenF))
+        else
+          traverser(q.tail ++: extendPath(q.head)(childrenF))  
+      }     
+    }
+    
+    traverser(Seq(Seq(start)))
+  }
+  
+  /////////////////////////////////////////////////////
+  /// all paths to leaves from start:T
+  /////////////////////////////////////////////////////
+  def allPaths[T](start:T)
+                 (childrenF:(T) => Seq[T]):Seq[Seq[T]]=
+  { 
+    def traverser(q:Seq[Seq[T]]):Seq[Seq[T]]=
+    {
+      if(q.isEmpty)
+        Nil
+      else
+      {
+        if(childrenF(q.head.head).nonEmpty)
+          traverser(q.tail ++: extendPath(q.head)(childrenF))
+        else  
+          q.head.reverse +: traverser(q.tail ++: extendPath(q.head)(childrenF)) 
+      }    
+    }
+    
+    traverser(Seq(Seq(start)))
+  }
+    
   def bfs[T](start:T, goal:T)(childrenF:(T) => Seq[T]):Seq[T] =
   {    
     search(goal, Seq(Seq(start)))
@@ -36,7 +80,7 @@ object Search
   {    
     search(goal, Seq(Seq(start)))
     {
-      q => extendPath(q.head)(childrenF) ++: q.tail  
+      q => extendPath(q.head)(childrenF) ++: q.tail 
     }
   }
   
@@ -75,11 +119,7 @@ object Search
     }
   }
   
-  def allPaths(start:T)
-              (childrenF:(T) => Seq[T]):Seq[T] =
-  {
-    
-  }            
+          
   
   def main(args:Array[String]):Unit = 
   {
@@ -120,6 +160,11 @@ object Search
       case a :: b :: Nil  => distance(a, b)
       case a :: b :: rest => distance(a, b) + cost(b +: rest)
     }  
+    
+    allPaths('s'){n => dagadj.getOrElse(n, Nil)}.foreach(println(_))
+    println()
+    println(findAllPaths('s', 'f'){n => dagadj.getOrElse(n, Nil)})
+    println()
                                    
     val a = dfs('s', 'f'){n => dagadj.getOrElse(n, Nil)}
     println(a)
@@ -131,19 +176,19 @@ object Search
             {
               (a, b, goal) => distance(a, goal) < distance(b, goal)
             }
-    println(c) 
+    println(c)
     println()
     val d = branchAndBound('s', 'f'){n => adj.getOrElse(n, Nil)}
             {
               (a, b) => cost(a) < cost(b)
             }
     println(d)
-    println() 
+    println()
     val e = beam('s', 'f', 1){n => adj.getOrElse(n, Nil)}
-    println(e)  
-    println() 
+    println(e)
+    println()
     val f = beam('s', 'f', 3){n => adj.getOrElse(n, Nil)}
-    println(f)        
+    println(f)  
   }
   
 }

@@ -31,7 +31,7 @@ object Search
   def allPaths[T](start:T, goal:Option[T] = None)
                      (childrenF:(T) => Seq[T]):Seq[Seq[T]]=
   { 
-    def traverser(q:Seq[Seq[T]]):Seq[Seq[T]]=
+    def traverse(q:Seq[Seq[T]]):Seq[Seq[T]]=
     {
       if(q.isEmpty)
         Nil
@@ -39,14 +39,14 @@ object Search
       {
         goal match
         {
-          case Some(g) if g == q.head.head            => q.head.reverse +: traverser(q.tail ++: extendPath(q.head)(childrenF))
-          case None if childrenF(q.head.head).isEmpty => q.head.reverse +: traverser(q.tail ++: extendPath(q.head)(childrenF))               
-          case _                                      => traverser(q.tail ++: extendPath(q.head)(childrenF))       
+          case Some(g) if g == q.head.head            => q.head.reverse +: traverse(q.tail ++: extendPath(q.head)(childrenF))
+          case None if childrenF(q.head.head).isEmpty => q.head.reverse +: traverse(q.tail ++: extendPath(q.head)(childrenF))               
+          case _                                      => traverse(q.tail ++: extendPath(q.head)(childrenF))       
         }
       }     
     }
     
-    traverser(Seq(Seq(start)))
+    traverse(Seq(Seq(start)))
   }
     
   def bfs[T](start:T, goal:T)(childrenF:(T) => Seq[T]):Seq[T] =
@@ -98,6 +98,12 @@ object Search
     {
       q => (extendPath(q.head)(childrenF) ++: q.tail).take(ext)
     }
+  }
+  
+  def costs[T, C](path:Seq[T])(fCost:(T, T) => C):Seq[C] = path match
+  {
+    case a :: b :: Nil  => Seq(fCost(a, b))
+    case a :: b :: rest => Seq(fCost(a, b)) ++: costs(b +: rest)(fCost)
   }          
   
   def main(args:Array[String]):Unit = 
@@ -132,13 +138,7 @@ object Search
       val dy = coord(a)._2 - coord(b)._2
       Math.sqrt(dx * dx + dy * dy)
     }       
-    
-    def cost(path:Seq[Char]):Double = path match
-    {
-      case Nil            => 0.0
-      case a :: b :: Nil  => distance(a, b)
-      case a :: b :: rest => distance(a, b) + cost(b +: rest)
-    }  
+      
     
     allPaths('s'){n => dagadj.getOrElse(n, Nil)}.foreach(println(_))
     println()
@@ -159,7 +159,7 @@ object Search
     println()
     val d = branchAndBound('s', 'f'){n => adj.getOrElse(n, Nil)}
             {
-              (a, b) => cost(a) < cost(b)
+              (a, b) => costs(a)(distance).sum < costs(b)(distance).sum
             }
     println(d)
     println()

@@ -98,9 +98,7 @@ object Search
     {
       q => (extendPath(q.head)(childrenF) ++: q.tail).take(ext)
     }
-  }
-  
-          
+  }          
   
   def main(args:Array[String]):Unit = 
   {

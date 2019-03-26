@@ -7,19 +7,19 @@
 object Search
 { 
   private def search[T](goal:T, queue:Seq[Seq[T]])
-                       (extendPathF:(Seq[Seq[T]]) => Seq[Seq[T]]):Seq[T] =
+                       (fExtendPath:(Seq[Seq[T]]) => Seq[Seq[T]]):Seq[T] =
   {
      if(queue.isEmpty) 
        Nil
      else if(goal == queue.head.head) 
        queue.head.reverse
      else
-       search(goal, extendPathF(queue))(extendPathF)
+       search(goal, fExtendPath(queue))(fExtendPath)
   }
   
-  private def extendPath[T](p:Seq[T])(childrenF:(T) => Seq[T]):Seq[Seq[T]]=
+  private def extendPath[T](p:Seq[T])(fChildren:(T) => Seq[T]):Seq[Seq[T]]=
   {
-    val l = for(e <- childrenF(p.head) if !p.contains(e)) yield e +: p
+    val l = for(e <- fChildren(p.head) if !p.contains(e)) yield e +: p
     //println(s"$p ----->  $l")
     l
   }
@@ -29,7 +29,7 @@ object Search
   /// all paths to leaves from start:T if goal is None
   /////////////////////////////////////////////////////  
   def allPaths[T](start:T, goal:Option[T] = None)
-                     (childrenF:(T) => Seq[T]):Seq[Seq[T]]=
+                 (fChildren:(T) => Seq[T]):Seq[Seq[T]]=
   { 
     def traverse(q:Seq[Seq[T]]):Seq[Seq[T]]=
     {
@@ -39,9 +39,9 @@ object Search
       {
         goal match
         {
-          case Some(g) if g == q.head.head            => q.head.reverse +: traverse(q.tail ++: extendPath(q.head)(childrenF))
-          case None if childrenF(q.head.head).isEmpty => q.head.reverse +: traverse(q.tail ++: extendPath(q.head)(childrenF))               
-          case _                                      => traverse(q.tail ++: extendPath(q.head)(childrenF))       
+          case Some(g) if g == q.head.head            => q.head.reverse +: traverse(q.tail ++: extendPath(q.head)(fChildren))
+          case None if fChildren(q.head.head).isEmpty => q.head.reverse +: traverse(q.tail ++: extendPath(q.head)(fChildren))               
+          case _                                      => traverse(q.tail ++: extendPath(q.head)(fChildren))       
         }
       }     
     }
@@ -49,29 +49,29 @@ object Search
     traverse(Seq(Seq(start)))
   }
     
-  def bfs[T](start:T, goal:T)(childrenF:(T) => Seq[T]):Seq[T] =
+  def bfs[T](start:T, goal:T)(fChildren:(T) => Seq[T]):Seq[T] =
   {    
     search(goal, Seq(Seq(start)))
     {
-      q => q.tail ++: extendPath(q.head)(childrenF)
+      q => q.tail ++: extendPath(q.head)(fChildren)
     }
   }
   
-  def dfs[T](start:T, goal:T)(childrenF:(T) => Seq[T]):Seq[T] =
+  def dfs[T](start:T, goal:T)(fChildren:(T) => Seq[T]):Seq[T] =
   {    
     search(goal, Seq(Seq(start)))
     {
-      q => extendPath(q.head)(childrenF) ++: q.tail 
+      q => extendPath(q.head)(fChildren) ++: q.tail 
     }
   }
   
   def bestFirst[T](start:T, goal:T)
-                  (childrenF:(T) => Seq[T])
+                  (fChildren:(T) => Seq[T])
                   (costF:(T, T, T) => Boolean):Seq[T] =
   {    
     search(goal, Seq(Seq(start)))
     {
-      q => (extendPath(q.head)(childrenF) ++: q.tail).sortWith
+      q => (extendPath(q.head)(fChildren) ++: q.tail).sortWith
            {
              (a, b) => costF(a.head, b.head, goal)
            }
@@ -79,12 +79,12 @@ object Search
   }
   
   def branchAndBound[T](start:T, goal:T)
-                       (childrenF:(T) => Seq[T])
+                       (fChildren:(T) => Seq[T])
                        (fCost:(Seq[T], Seq[T]) => Boolean):Seq[T] =
   {    
     search(goal, Seq(Seq(start)))
     {
-      q => (extendPath(q.head)(childrenF) ++: q.tail).sortWith
+      q => (extendPath(q.head)(fChildren) ++: q.tail).sortWith
            {
              (a, b) => fCost(a, b)
            }
@@ -92,11 +92,11 @@ object Search
   }
   
   def beam[T](start:T, goal:T, ext:Int)
-             (childrenF:(T) => Seq[T]):Seq[T] =
+             (fChildren:(T) => Seq[T]):Seq[T] =
   {    
     search(goal, Seq(Seq(start)))
     {
-      q => (extendPath(q.head)(childrenF) ++: q.tail).take(ext)
+      q => (extendPath(q.head)(fChildren) ++: q.tail).take(ext)
     }
   }
   
